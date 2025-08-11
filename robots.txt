@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://thanis.ai/sitemap.xml
