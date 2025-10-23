@@ -50,7 +50,7 @@ export function middleware(req) {
     return res
   }
 
-  // ---- fallback: your normal auth + session handling below ----
+  // ---- fallback: normal cookie/session setup ----
   let sid = req.cookies.get('sid')?.value
   if (!sid) {
     sid = crypto.randomUUID()
@@ -67,4 +67,16 @@ export function middleware(req) {
     if (!existing && incoming) setCookie(res, key, incoming, 60 * 60 * 24 * 90)
   }
 
-  if (!req.cookies.get('lp')?.value)
+  if (!req.cookies.get('lp')?.value) {
+    const lp = `${url.pathname}${url.search}`.slice(0, 200)
+    setCookie(res, 'lp', lp, 60 * 60 * 24 * 90)
+  }
+
+  return res
+}
+
+export const config = {
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|svg|gif|ico|webp|txt)).*)',
+  ],
+}
