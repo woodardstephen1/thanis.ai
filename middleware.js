@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server'
-import crypto from 'crypto'
+
+function newId() {
+  // native WebCrypto in the Edge runtime
+  return crypto.randomUUID()
+}
 
 function setCookie(res, name, value, maxAgeSeconds) {
   res.cookies.set(name, value, {
@@ -11,7 +15,7 @@ function setCookie(res, name, value, maxAgeSeconds) {
   })
 }
 
-// public API routes allowed without auth in staging
+// open endpoints for staging telemetry
 const PUBLIC_API_PREFIXES = ['/api/analyze', '/api/telemetry/page']
 
 export function middleware(req) {
@@ -26,7 +30,7 @@ export function middleware(req) {
   if (env === 'staging' && isPublic) {
     let sid = req.cookies.get('sid')?.value
     if (!sid) {
-      sid = crypto.randomUUID()
+      sid = newId()
       setCookie(res, 'sid', sid, 60 * 60 * 24 * 365)
       setCookie(res, 'sid_is_new', '1', 60 * 10)
     }
@@ -57,7 +61,7 @@ export function middleware(req) {
   // ---- default cookie/session setup ----
   let sid = req.cookies.get('sid')?.value
   if (!sid) {
-    sid = crypto.randomUUID()
+    sid = newId()
     setCookie(res, 'sid', sid, 60 * 60 * 24 * 365)
     setCookie(res, 'sid_is_new', '1', 60 * 10)
   }
